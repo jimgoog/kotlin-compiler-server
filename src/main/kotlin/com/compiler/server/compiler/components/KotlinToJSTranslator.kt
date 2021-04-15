@@ -15,7 +15,6 @@ import org.jetbrains.kotlin.js.facade.TranslationResult
 import org.jetbrains.kotlin.js.facade.exceptions.TranslationException
 import org.jetbrains.kotlin.psi.KtFile
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class KotlinToJSTranslator(
@@ -26,7 +25,7 @@ class KotlinToJSTranslator(
     private const val JS_CODE_FLUSH = "kotlin.kotlin.io.output.flush();\n"
     private const val JS_CODE_BUFFER = "\nkotlin.kotlin.io.output.buffer;\n"
 
-    private const val JS_IR_CODE_BUFFER = "moduleId.output._buffer;\n"
+    private const val JS_IR_CODE_BUFFER = "if (typeof moduleId.output !== 'undefined') moduleId.output._buffer;\n"
 
     const val BEFORE_MAIN_CALL_LINE = 4
   }
@@ -89,7 +88,8 @@ class KotlinToJSTranslator(
   fun doTranslateWithIr(
     files: List<KtFile>,
     arguments: List<String>,
-    coreEnvironment: KotlinCoreEnvironment
+    coreEnvironment: KotlinCoreEnvironment,
+    dce: Boolean
   ): TranslationJSResult {
     val currentProject = coreEnvironment.project
     val configuration = JsConfig(
@@ -108,16 +108,18 @@ class KotlinToJSTranslator(
       allDependencies = kotlinEnvironment.jsIrResolvedLibraries,
       friendDependencies = emptyList(),
       propertyLazyInitialization = false,
-      mainArguments = arguments
+      mainArguments = arguments,
+      generateDceJs = dce
     )
-    val jsCode = result.jsCode!!.mainModule
+
+    val jsCode = if (dce) result.dceJsCode!!.mainModule else result.jsCode!!.mainModule
 
     val listLines = jsCode
       .lineSequence()
       .toMutableList()
 
-    listLines.add(listLines.size - BEFORE_MAIN_CALL_LINE, "if (kotlin.isRewrite) output = new BufferedOutput_0()")
-    listLines.add(listLines.size - BEFORE_MAIN_CALL_LINE, "_.output = output")
+    listLines.add(listLines.size - BEFORE_MAIN_CALL_LINE, "if (kotlin.isRewrite && typeof BufferedOutput_0 !== 'undefined' && typeof output !== 'undefined') output = new BufferedOutput_0()")
+    listLines.add(listLines.size - BEFORE_MAIN_CALL_LINE, "if (typeof output !== 'undefined') _.output = output")
     listLines.add(listLines.size - 1, JS_IR_CODE_BUFFER)
 
     return TranslationJSResult(listLines.joinToString("\n"))

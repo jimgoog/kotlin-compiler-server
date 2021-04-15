@@ -48,15 +48,24 @@ class KotlinProjectExecutor(
     }
   }
 
-  fun convertToJsIr(project: Project): TranslationJSResult {
+  fun convertToJsIr(
+    project: Project,
+    dce: Boolean = false
+  ): TranslationJSResult {
     return kotlinEnvironment.environment { environment ->
       val files = getFilesFrom(project, environment).map { it.kotlinFile }
       kotlinToJSTranslator.translate(
         files,
         project.args.split(" "),
-        environment,
-        kotlinToJSTranslator::doTranslateWithIr
-      )
+        environment
+      ) { filesLocal, arguments, environmentLocal ->
+        kotlinToJSTranslator.doTranslateWithIr(
+          filesLocal,
+          arguments,
+          environmentLocal,
+          dce
+        )
+      }
     }
   }
 
