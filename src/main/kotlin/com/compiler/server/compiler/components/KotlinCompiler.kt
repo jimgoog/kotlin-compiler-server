@@ -123,10 +123,6 @@ class KotlinCompiler(
     analysis: Analysis,
     coreEnvironment: KotlinCoreEnvironment
   ): GenerationState {
-    val codegenFactory = if (coreEnvironment.configuration.getBoolean(JVMConfigurationKeys.IR)) JvmIrCodegenFactory(
-            coreEnvironment.configuration.get(CLIConfigurationKeys.PHASE_CONFIG) ?: PhaseConfig(jvmPhases)
-    ) else DefaultCodegenFactory
-
     return GenerationState.Builder(
       files.first().project,
       ClassBuilderFactories.BINARIES,
@@ -134,7 +130,7 @@ class KotlinCompiler(
       analysis.analysisResult.bindingContext,
       files,
       coreEnvironment.configuration
-    ).codegenFactory(codegenFactory).build()
+    ).build()
   }
 
   private fun argsFrom(
