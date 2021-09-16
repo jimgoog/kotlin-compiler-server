@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.idea.MainFunctionDetector
 import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -154,8 +155,11 @@ class KotlinCompiler(
 
   private fun mainClassFrom(bindingContext: BindingContext, files: List<KtFile>): String? {
     val mainFunctionDetector = MainFunctionDetector(bindingContext, LanguageVersionSettingsImpl.DEFAULT)
-    return files.find { mainFunctionDetector.hasMain(it.declarations) }?.let {
-      PackagePartClassUtils.getPackagePartFqName(it.packageFqName, it.name).asString()
+    return files.find {
+      it.declarations.filterIsInstance<KtNamedFunction>()
+        .find { main -> mainFunctionDetector.isMain(main) } != null
+    }.let {
+      it?.let { it1 -> PackagePartClassUtils.getPackagePartFqName(it1.packageFqName, it.name).asString() }
     }
   }
 
