@@ -114,9 +114,10 @@ class KotlinToJSTranslator(
       friendDependencies = emptyList(),
       propertyLazyInitialization = false,
       mainArguments = arguments,
-      irFactory = IrFactoryImpl
+      irFactory = IrFactoryImpl,
+      generateDceJs = true
     )
-    val jsCode = result.outputs!!.jsCode
+    val jsCode = result.outputsAfterDce!!.jsCode
 
     val listLines = jsCode
       .lineSequence()
