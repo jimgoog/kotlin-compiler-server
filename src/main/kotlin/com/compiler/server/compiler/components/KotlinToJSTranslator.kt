@@ -38,15 +38,15 @@ class KotlinToJSTranslator(
     coreEnvironment: KotlinCoreEnvironment,
     translate: (List<KtFile>, List<String>, KotlinCoreEnvironment) -> TranslationJSResult
   ): TranslationJSResult {
-    val (errors, _) = errorAnalyzer.errorsFrom(files, coreEnvironment, isJs = true)
+//    val (errors, _) = errorAnalyzer.errorsFrom(files, coreEnvironment, isJs = true)
     return try {
-      if (errorAnalyzer.isOnlyWarnings(errors)) {
+//      if (errorAnalyzer.isOnlyWarnings(errors)) {
         translate(files, arguments, coreEnvironment).also {
-          it.addWarnings(errors)
+//          it.addWarnings(errors)
         }
-      } else {
-        TranslationJSResult(errors = errors)
-      }
+//      } else {
+//        TranslationJSResult(errors = errors)
+//      }
     } catch (e: Exception) {
       TranslationJSResult(exception = e.toExceptionDescriptor())
     }

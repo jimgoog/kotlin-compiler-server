@@ -31,7 +31,7 @@ val kotlinJsDependency: Configuration by configurations.creating {
     }
 }
 val kotlinJsIrDependency: Configuration by configurations.creating {
-    isTransitive = false
+    isTransitive = true
     attributes {
         attribute(
             KotlinPlatformType.attribute,

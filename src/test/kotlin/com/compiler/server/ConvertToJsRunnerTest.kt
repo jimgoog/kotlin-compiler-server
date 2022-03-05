@@ -37,7 +37,7 @@ class ConvertToJsIrRunnerTest : BaseExecutorTest() {
   @Test
   fun `base execute test`() {
     runJsIr(
-      code = "fun main() {\n println(\"Hello, world!!!\")\n}",
+      code = "import kotlinx.coroutines.Job\n\nfun main() {\n println(\"Hello, world!!!\")\n}",
       contains = "println('Hello, world!!!');"
     )
   }
