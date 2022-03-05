@@ -30,7 +30,21 @@ val kotlinJsDependency: Configuration by configurations.creating {
         )
     }
 }
+val kotlinJsIrDependency: Configuration by configurations.creating {
+    isTransitive = false
+    attributes {
+        attribute(
+            KotlinPlatformType.attribute,
+            KotlinPlatformType.js
+        )
+        attribute(
+            KotlinJsCompilerAttribute.jsCompilerAttribute,
+            KotlinJsCompilerAttribute.ir
+        )
+    }
+}
 val libJSFolder = "$kotlinVersion-js"
+val libJSIRFolder = "$kotlinVersion-js-ir"
 val libJVMFolder = kotlinVersion
 val propertyFile = "application.properties"
 
@@ -41,6 +55,11 @@ val copyDependencies by tasks.creating(Copy::class) {
 val copyJSDependencies by tasks.creating(Copy::class) {
     from(files(Callable { kotlinJsDependency.map { zipTree(it) } }))
     into(libJSFolder)
+}
+
+val copyJSIRDependencies by tasks.creating(Copy::class) {
+    from(files(Callable { kotlinJsIrDependency }))
+    into(libJSIRFolder)
 }
 
 plugins {
@@ -84,6 +103,10 @@ dependencies {
     kotlinDependency("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
     kotlinDependency("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.0")
     kotlinJsDependency("org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion")
+    kotlinJsIrDependency("org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion")
+
+    // For example using some IR dependency
+    kotlinJsIrDependency("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
     annotationProcessor("org.springframework:spring-context-indexer")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -128,7 +151,7 @@ fun generateProperties(prefix: String = "") = """
     indexes.file=${prefix + indexes}
     indexesJs.file=${prefix + indexesJs}
     libraries.folder.jvm=${prefix + libJVMFolder}
-    libraries.folder.js=${prefix + libJSFolder}
+    libraries.folder.js=${prefix + libJSIRFolder}
     executor.logs=${executorLogs}
 """.trimIndent()
 
@@ -139,6 +162,7 @@ tasks.withType<KotlinCompile> {
     }
     dependsOn(copyDependencies)
     dependsOn(copyJSDependencies)
+    dependsOn(copyJSIRDependencies)
     dependsOn(":executors:jar")
     dependsOn(":indexation:run")
     buildPropertyFile()

@@ -88,19 +88,19 @@ class KotlinEnvironment(
 
   val jsIrPhaseConfig = createPhaseConfig(jsPhases, K2JsIrCompiler().createArguments(), messageCollector)
 
-  val jsIrResolvedLibraries = jsResolveLibraries(
-    JS_LIBRARIES,
-    emptyList(),
-    object : Logger {
-      override fun error(message: String) {}
-      override fun fatal(message: String): Nothing {
-        TODO("Fake logger for compiler server")
-      }
-
-      override fun log(message: String) {}
-      override fun warning(message: String) {}
-    }
-  )
+//  val jsIrResolvedLibraries = jsResolveLibraries(
+//    JS_LIBRARIES,
+//    emptyList(),
+//    object : Logger {
+//      override fun error(message: String) {}
+//      override fun fatal(message: String): Nothing {
+//        TODO("Fake logger for compiler server")
+//      }
+//
+//      override fun log(message: String) {}
+//      override fun warning(message: String) {}
+//    }
+//  )
 
   private val environment = KotlinCoreEnvironment.createForProduction(
     parentDisposable = Disposer.newDisposable(),
