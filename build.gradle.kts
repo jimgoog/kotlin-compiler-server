@@ -72,6 +72,7 @@ plugins {
 allprojects {
     repositories {
         mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev/")
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-ide")
         maven("https://cache-redirector.jetbrains.com/jetbrains.bintray.com/intellij-third-party-dependencies")
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-ide-plugin-dependencies")
@@ -107,6 +108,10 @@ dependencies {
 
     // For example using some IR dependency
     kotlinJsIrDependency("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    kotlinJsIrDependency("org.jetbrains.compose.runtime:runtime-js:1.2.0-alpha01-dev629")
+    kotlinJsIrDependency("org.jetbrains.compose.material:material:1.2.0-alpha01-dev629")
+    kotlinJsIrDependency("org.jetbrains.kotlinx:atomicfu-js:0.17.1")
+    kotlinJsIrDependency("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
 
     annotationProcessor("org.springframework:spring-context-indexer")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -129,6 +134,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:core:211-$kotlinIdeVersion-IJ7442.40")
     implementation(project(":executors", configuration = "default"))
     implementation(project(":common", configuration = "default"))
+
+    implementation("org.jetbrains.compose.compiler:compiler-hosted:1.2.0-alpha01-dev629")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")

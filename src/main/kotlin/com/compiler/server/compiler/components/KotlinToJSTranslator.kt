@@ -1,11 +1,15 @@
 package com.compiler.server.compiler.components
 
+import androidx.compose.compiler.plugins.kotlin.ComposeComponentRegistrar
 import com.compiler.server.model.ErrorDescriptor
 import com.compiler.server.model.TranslationJSResult
 import com.compiler.server.model.toExceptionDescriptor
+import com.intellij.openapi.project.Project
 import component.KotlinEnvironment
+import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.backend.js.compile
 import org.jetbrains.kotlin.ir.backend.js.prepareAnalyzedSourceModule
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
@@ -94,6 +98,12 @@ class KotlinToJSTranslator(
     coreEnvironment: KotlinCoreEnvironment
   ): TranslationJSResult {
     val currentProject = coreEnvironment.project
+
+    if(IrGenerationExtension.getInstances(currentProject).isEmpty())
+      ComposeComponentRegistrar.registerProjectExtensions(
+        currentProject,
+        kotlinEnvironment.jsConfiguration
+      )
 
     val sourceModule = prepareAnalyzedSourceModule(
       currentProject,
